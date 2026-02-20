@@ -1,0 +1,150 @@
+[
+    {
+        "table": "alarm",
+        "schema_text": "Table: alarm | Columns: id (integer) [PK], code (character varying), type (character varying), description (character varying), importance (integer), create_date (timestamp without time zone), update_date (timestamp without time zone), process_method (character varying), file_id_list (ARRAY), valid_record (boolean), send_enabled (boolean), reset_available (boolean), equipment_type_id (integer)"
+    },
+    {
+        "table": "alarm_history",
+        "schema_text": "Table: alarm_history | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), process_date (timestamp without time zone), message (character varying), process_message (character varying), type (character varying)"
+    },
+    {
+        "table": "alarm_history_process_by_user",
+        "schema_text": "Table: alarm_history_process_by_user | Columns: id (integer) [PK], user_seq_id (integer), alarm_history_id (integer)"
+    },
+    {
+        "table": "alarm_queue",
+        "schema_text": "Table: alarm_queue | Columns: id (integer) [PK], create_date (timestamp without time zone), process_status (integer), alarm_id (integer), equipment_id (integer)"
+    },
+    {
+        "table": "alarm_user_relation",
+        "schema_text": "Table: alarm_user_relation | Columns: id (integer) [PK], user_seq_id (integer), alarm_id (integer)"
+    },
+    {
+        "table": "cell_view",
+        "schema_text": "Table: cell_view | Columns: id (integer) [PK], loc_x (integer), loc_y (integer), loc_z (integer), enable (boolean), cell_status (character varying), sku_key (character varying), standard_type (character varying), st_count (integer), in_date (timestamp without time zone), update_date (timestamp without time zone), luggage_flag (boolean), batch_number (character varying), order_number (character varying), order_flow (character varying), loc_all (character varying), loc_unit (character varying), warehouse_id (integer), pallet_id (integer)"
+    },
+    {
+        "table": "crane_cell",
+        "schema_text": "Table: crane_cell | Columns: id (integer) [PK], bank (integer), bay (integer), level (integer), enable (boolean), cell_status (USER-DEFINED), create_date (timestamp without time zone), update_date (timestamp without time zone), equipment_id (integer)"
+    },
+    {
+        "table": "dock_view",
+        "schema_text": "Table: dock_view | Columns: id (integer) [PK], dock_no (integer), gantry_code (integer), status (character varying), shipment_order (integer), container_no (character varying), unit_order_count (integer), order_count (integer), outing_count (integer), in_gantry_count (integer), conveyor_count (integer), completion_count (integer), remand_count (integer), bad_count (integer)"
+    },
+    {
+        "table": "equipment",
+        "schema_text": "Table: equipment | Columns: id (integer) [PK], spec (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), name (character varying), code (character varying), equipment_type_id (integer), warehouse_id (integer)"
+    },
+    {
+        "table": "equipment_alarm_history",
+        "schema_text": "Table: equipment_alarm_history | Columns: id (integer) [PK], equipment_name (character varying), equipment_code (character varying), alarm_id (integer), alarm_history_id (integer)"
+    },
+    {
+        "table": "equipment_operation_history",
+        "schema_text": "Table: equipment_operation_history | Columns: id (integer) [PK], create_date (timestamp without time zone), operation_status (character varying), operation_maintenance_type (character varying), description (character varying), equipment_id (integer)"
+    },
+    {
+        "table": "equipment_operation_maintenance",
+        "schema_text": "Table: equipment_operation_maintenance | Columns: id (integer) [PK], start_date (timestamp without time zone), end_date (timestamp without time zone), create_date (timestamp without time zone), operation_maintenance_type (character varying), description (character varying), equipment_id (integer)"
+    },
+    {
+        "table": "equipment_type",
+        "schema_text": "Table: equipment_type | Columns: id (integer) [PK], create_date (timestamp without time zone), name (character varying), description (character varying), valid_record (boolean), type (character varying)"
+    },
+    {
+        "table": "file",
+        "schema_text": "Table: file | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), name (text), stored_name (text), path (text)"
+    },
+    {
+        "table": "gantry_cell",
+        "schema_text": "Table: gantry_cell | Columns: id (integer) [PK], port (integer), bank (integer), bay (integer), enable (boolean), cell_status (USER-DEFINED), create_date (timestamp without time zone), update_date (timestamp without time zone), equipment_id (integer)"
+    },
+    {
+        "table": "inventory_alarm_history",
+        "schema_text": "Table: inventory_alarm_history | Columns: id (integer) [PK], standard_type (character varying), stored_item_count (integer), inventory_alarm_type (character varying), alert_type (character varying), warehouse_name (character varying), warehouse_code (character varying), warehouse_type (character varying), alarm_history_id (integer)"
+    },
+    {
+        "table": "item_master_view",
+        "schema_text": "Table: item_master_view | Columns: sku_key (character varying) [PK], standard_type (character varying)"
+    },
+    {
+        "table": "job_history",
+        "schema_text": "Table: job_history | Columns: id (integer) [PK], sku_key (character varying), standard_type (character varying), working_status (character varying), st_count (integer), loc_raw (character varying), task_type (character varying), batch_number (character varying), order_number (character varying), order_flow (character varying), job_date (timestamp without time zone), create_date (timestamp without time zone), pallet_id (integer), warehouse_id (integer)"
+    },
+    {
+        "table": "job_queue",
+        "schema_text": "Table: job_queue | Columns: id (integer) [PK], working_status (character varying), st_count (integer), loc_raw (character varying), task_type (character varying), batch_number (character varying), order_number (character varying), order_flow (character varying), job_date (timestamp without time zone), warehouse_id (integer), pallet_id (integer), sku_key (character varying)"
+    },
+    {
+        "table": "login_history",
+        "schema_text": "Table: login_history | Columns: id (integer) [PK], try_ip (character varying), create_date (timestamp without time zone), users_seq_id (integer)"
+    },
+    {
+        "table": "long_term_item_alarm_history",
+        "schema_text": "Table: long_term_item_alarm_history | Columns: id (integer) [PK], standard_type (character varying), long_term_item_count (integer), alarm_history_id (integer), warehouse_id (integer)"
+    },
+    {
+        "table": "message_dispatch_history",
+        "schema_text": "Table: message_dispatch_history | Columns: id (integer) [PK], type (character varying), message (character varying), dispatch_success (boolean), create_date (timestamp without time zone), alarm_history_id (integer), users_seq_id (integer)"
+    },
+    {
+        "table": "noti",
+        "schema_text": "Table: noti | Columns: id (integer) [PK], title (character varying), content (text), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), users_seq_id (integer)"
+    },
+    {
+        "table": "pallet",
+        "schema_text": "Table: pallet | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), code (character varying)"
+    },
+    {
+        "table": "pallet_alarm_history",
+        "schema_text": "Table: pallet_alarm_history | Columns: id (integer) [PK], warning_count (integer), alarm_history_id (integer)"
+    },
+    {
+        "table": "realtime_equipment_view",
+        "schema_text": "Table: realtime_equipment_view | Columns: id (integer) [PK], speed (integer), status (character varying), loc_x (integer), loc_y (integer), loc_z (integer), task_type (character varying), standard_type (character varying), st_count (integer), create_date (timestamp without time zone), twin_status (character varying), loaded (boolean), action_type (character varying), equipment_id (integer)"
+    },
+    {
+        "table": "realtime_warehouse_view",
+        "schema_text": "Table: realtime_warehouse_view | Columns: id (integer) [PK], equipment_code (character varying), loc_x (integer), loc_y (integer), loc_z (integer), loaded (boolean), use_type (USER-DEFINED), standard_type (character varying), st_count (integer), warehouse_id (integer)"
+    },
+    {
+        "table": "refresh-token",
+        "schema_text": "Table: refresh-token | Columns: id (integer) [PK], refresh_token (character varying), create_date (timestamp without time zone), expires_date (timestamp without time zone), user_seq_id (integer)"
+    },
+    {
+        "table": "role",
+        "schema_text": "Table: role | Columns: id (integer) [PK], type (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), description (character varying), user_seq_id (integer)"
+    },
+    {
+        "table": "seed_option",
+        "schema_text": "Table: seed_option | Columns: id (integer) [PK], database_version (double precision)"
+    },
+    {
+        "table": "setting_remote",
+        "schema_text": "Table: setting_remote | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), location (character varying), ip (character varying), port (integer), seq_id (integer)"
+    },
+    {
+        "table": "setting_system",
+        "schema_text": "Table: setting_system | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), alarm_send_enabled (boolean), equipment_alarm_enabled (boolean), inventory_alarm_enabled (boolean), inventory_alarm_remaining_day (integer), load_warning_ratio_crane (integer), load_danger_ratio_crane (integer), load_warning_color_crane (character varying), load_danger_color_crane (character varying), load_warning_ratio_gantry (integer), load_danger_ratio_gantry (integer), load_warning_color_gantry (character varying), load_danger_color_gantry (character varying), refresh_browser (boolean)"
+    },
+    {
+        "table": "shipping_specification",
+        "schema_text": "Table: shipping_specification | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), standard_type (character varying), users_seq_id (integer)"
+    },
+    {
+        "table": "stored_item",
+        "schema_text": "Table: stored_item | Columns: id (integer) [PK], standard_type (character varying), detail (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), sku_id (character varying)"
+    },
+    {
+        "table": "todo",
+        "schema_text": "Table: todo | Columns: id (integer) [PK], standard_type (character varying), target_start_date (timestamp without time zone), target_end_date (timestamp without time zone), target_count (integer), description (text), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), alarm_offset_hours (integer), alarm_process_flag (boolean), users_seq_id (integer)"
+    },
+    {
+        "table": "users",
+        "schema_text": "Table: users | Columns: seq_id (integer) [PK], user_id (character varying), password (character varying), email (character varying), name (character varying), affiliation (character varying), phone_number (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), blocking (boolean)"
+    },
+    {
+        "table": "warehouse",
+        "schema_text": "Table: warehouse | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), type (character varying), code (character varying), name (character varying)"
+    }
+]
