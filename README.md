@@ -1,4 +1,4 @@
-# TAG-test — Text-to-SQL Pipeline
+# Text-to-SQL Pipeline Exp
 
 A PostgreSQL-based natural language → SQL pipeline for Korean enterprise data.  
 Two execution paths are provided: **Simple pipeline** (lightweight) and **IR-use pipeline** (full).
