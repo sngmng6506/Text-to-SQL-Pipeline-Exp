@@ -41,6 +41,8 @@ GROUP BY
 """
 
 
+
+
 def get_postgres_schema() -> list[dict]:
     db_config = {
         "host": os.getenv("DB_HOST"),
@@ -50,24 +52,20 @@ def get_postgres_schema() -> list[dict]:
         "port": os.getenv("DB_PORT", 5432),
     }
     try:
-        conn = psycopg2.connect(**db_config)
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute(_SCHEMA_QUERY)
-        rows = cur.fetchall()
-        return [
-            {
-                "table": row["table_name"],
-                "schema_text": f"Table: {row['table_name']} | Columns: {row['schema_details']}",
-            }
-            for row in rows
-        ]
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(_SCHEMA_QUERY)
+                rows = cur.fetchall()
+                return [
+                    {
+                        "table": row["table_name"],
+                        "schema_text": f"Table: {row['table_name']} | Columns: {row['schema_details']}",
+                    }
+                    for row in rows
+                ]
     except Exception as e:
         print(f"Connection Failed: {e}")
         return []
-    finally:
-        if "conn" in locals() and conn:
-            cur.close()
-            conn.close()
 
 
 def save_schema(schema_data: list[dict], output_path: Path = SCHEMA_JSON_PATH) -> None:
@@ -75,6 +73,7 @@ def save_schema(schema_data: list[dict], output_path: Path = SCHEMA_JSON_PATH) -
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(schema_data, f, ensure_ascii=False, indent=4)
     print(f"저장 완료: {output_path} ({len(schema_data)}개 테이블)")
+
 
 
 def main() -> None:
@@ -88,8 +87,7 @@ def main() -> None:
         loaded = json.load(f)
     print(f"[확인] 총 {len(loaded)}개 테이블")
     if loaded:
-        import json as _json
-        print(f"첫 번째 샘플:\n{_json.dumps(loaded[0], indent=2, ensure_ascii=False)}")
+        print(f"첫 번째 샘플:\n{json.dumps(loaded[0], indent=2, ensure_ascii=False)}")
 
 
 if __name__ == "__main__":

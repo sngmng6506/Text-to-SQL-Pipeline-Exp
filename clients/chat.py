@@ -1,7 +1,6 @@
 """
-vLLM(OpenAI-compatible) Chat Completions 클라이언트
-
-- endpoint 예: http://172.22.51.221:8000/v1/chat/completions
+vLLM(OpenAI-compatible) Chat Completions
+endpoint: {base_url}/chat/completions (base_url에 /v1 포함 가정)
 """
 
 from __future__ import annotations
@@ -10,54 +9,17 @@ import os
 from dataclasses import dataclass
 from typing import Any, Optional
 
+import time
+
 import requests
-
-
-def _extract_one_line_from_reasoning(reasoning: str) -> str | None:
-    """
-    vLLM reasoning 모드에서 message.content=None, message.reasoning만 채워지는 경우가 있어
-    reasoning 문자열에서 '최종 한 줄'을 최대한 안전하게 뽑아낸다.
-    """
-    if not reasoning:
-        return None
-    text = reasoning.strip()
-
-    # 1) 'Rewritten Question:' 라인이 있으면 그 뒤 한 줄
-    key = "Rewritten Question:"
-    if key in text:
-        tail = text.split(key, 1)[1].strip()
-        return tail.splitlines()[0].strip() if tail else None
-
-    # 2) 마지막으로 "<table.column = '...'>" 패턴이 포함된 라인 우선
-    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    for ln in reversed(lines):
-        if "<" in ln and ">" in ln and "=" in ln:
-            return ln
-
-    # 3) 그 외에는 첫 줄만(너무 길게 나오는 걸 방지)
-    return lines[0] if lines else None
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 
 @dataclass(frozen=True)
 class VllmChatClient:
-    base_url: str
+    base_url: str  # e.g. http://host:8000/v1
     api_key: str | None = None
     timeout_sec: int = 60
-
-    def _api_v1_base(self) -> str:
-        """
-        base_url이
-        - http://host:port 인 경우 → http://host:port/v1
-        - http://host:port/v1 인 경우 → 그대로 사용
-        """
-        base = self.base_url.rstrip("/")
-        return base if base.endswith("/v1") else f"{base}/v1"
-
-    def _headers(self) -> dict[str, str]:
-        headers = {"Content-Type": "application/json"}
-        if self.api_key:
-            headers["Authorization"] = f"Bearer {self.api_key}"
-        return headers
 
     def chat_completions(
         self,
@@ -68,12 +30,7 @@ class VllmChatClient:
         max_tokens: int = 512,
         extra: Optional[dict[str, Any]] = None,
     ) -> str:
-        """
-        POST /v1/chat/completions
-        반환: assistant content 문자열
-        """
-        url = f"{self._api_v1_base()}/chat/completions"
-
+        url = f"{self.base_url.rstrip('/')}/chat/completions"
         payload: dict[str, Any] = {
             "messages": messages,
             "temperature": temperature,
@@ -85,28 +42,100 @@ class VllmChatClient:
         if extra:
             payload.update(extra)
 
-        r = requests.post(url, headers=self._headers(), json=payload, timeout=self.timeout_sec)
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
+        last_exc: Exception | None = None
+        for attempt in range(3):
+            try:
+                r = requests.post(url, headers=headers, json=payload, timeout=self.timeout_sec)
+                break
+            except RequestsConnectionError as e:
+                last_exc = e
+                wait = 2 ** attempt
+                print(f"[WARN] 연결 오류 (시도 {attempt+1}/3), {wait}s 후 재시도...", flush=True)
+                time.sleep(wait)
+        else:
+            raise RuntimeError(f"연결 실패 (3회 재시도 초과): {last_exc}")
+
         if not r.ok:
             raise RuntimeError(f"HTTP {r.status_code} {url}\n{r.text}")
         data = r.json()
 
-        try:
-            choice0 = data["choices"][0]
-            msg = choice0.get("message")
-            if isinstance(msg, dict) and isinstance(msg.get("content"), str):
-                return msg["content"]
-            # 일부 reasoning 모드에서 content=None, reasoning만 채워짐
-            if isinstance(msg, dict) and msg.get("content") is None and isinstance(msg.get("reasoning"), str):
-                extracted = _extract_one_line_from_reasoning(msg["reasoning"])
-                if extracted:
-                    return extracted
-        except Exception:
-            pass
-        raise RuntimeError(f"Unexpected chat/completions response shape: {data}")
+        choice = data.get("choices", [{}])[0]
+        finish_reason = choice.get("finish_reason", "")
+        if finish_reason == "length":
+            print(f"[WARN] 응답이 max_tokens에서 잘림 (finish_reason=length, max_tokens={max_tokens})", flush=True)
+        msg = choice.get("message") or {}
+        content = msg.get("content")
+        if isinstance(content, str):
+            return content
+        raise RuntimeError(f"Unexpected response: {data}")
+
+    def chat_completions_n(
+        self,
+        *,
+        messages: list[dict[str, str]],
+        model: Optional[str] = None,
+        n: int = 3,
+        temperature: float = 0.4,
+        max_tokens: int = 512,
+        extra: Optional[dict[str, Any]] = None,
+    ) -> list[str]:
+        """n개의 완성 후보를 한 번의 요청으로 반환한다 (vLLM n 파라미터 활용)."""
+        url = f"{self.base_url.rstrip('/')}/chat/completions"
+        payload: dict[str, Any] = {
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "n": n,
+            "stream": False,
+        }
+        if model:
+            payload["model"] = model
+        if extra:
+            payload.update(extra)
+
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
+        last_exc: Exception | None = None
+        for attempt in range(3):
+            try:
+                r = requests.post(url, headers=headers, json=payload, timeout=self.timeout_sec)
+                break
+            except RequestsConnectionError as e:
+                last_exc = e
+                wait = 2 ** attempt
+                print(f"[WARN] 연결 오류 (시도 {attempt+1}/3), {wait}s 후 재시도...", flush=True)
+                time.sleep(wait)
+        else:
+            raise RuntimeError(f"연결 실패 (3회 재시도 초과): {last_exc}")
+
+        if not r.ok:
+            raise RuntimeError(f"HTTP {r.status_code} {url}\n{r.text}")
+        data = r.json()
+
+        results: list[str] = []
+        for choice in data.get("choices", []):
+            msg = (choice.get("message") or {})
+            content = msg.get("content")
+            if isinstance(content, str):
+                results.append(content)
+        if not results:
+            raise RuntimeError(f"Unexpected response (no choices): {data}")
+        return results
 
 
 def default_vllm_client() -> VllmChatClient:
-    base_url = os.getenv("VLLM_CHAT_BASE_URL") or os.getenv("VLLM_BASE_URL", "http://172.22.51.221:8000")
-    api_key = os.getenv("VLLM_API_KEY")
-    timeout_sec = int(os.getenv("VLLM_TIMEOUT_SEC", "60"))
-    return VllmChatClient(base_url=base_url, api_key=api_key, timeout_sec=timeout_sec)
+    base = os.getenv("VLLM_CHAT_BASE_URL") or os.getenv("VLLM_BASE_URL", "http://172.22.51.221:8000")
+    base_url = base if base.rstrip("/").endswith("/v1") else f"{base.rstrip('/')}/v1"
+    return VllmChatClient(
+        base_url=base_url,
+        api_key=os.getenv("VLLM_API_KEY"),
+        timeout_sec=int(os.getenv("VLLM_TIMEOUT_SEC", "180")),
+    )
+
+

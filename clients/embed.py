@@ -2,7 +2,7 @@
 TEI(Text Embeddings Inference) 클라이언트
 
 - endpoint 예: http://172.22.51.221:8080/embed
-- payload: {"input": ["text1", "text2", ...]}
+- payload: {"inputs": ["text1", "text2", ...]}
 - model 필드 없음 (TEI는 서버 시작 시 모델이 고정됨)
 """
 
@@ -50,7 +50,13 @@ class TeiEmbedClient:
         raise RuntimeError(f"Unexpected TEI embeddings response: {data}")
 
 
+_cached_client: TeiEmbedClient | None = None
+
+
 def default_embed_client() -> TeiEmbedClient:
-    base_url = os.getenv("TEI_BASE_URL", "http://172.22.51.221:8080")
-    timeout_sec = int(os.getenv("VLLM_TIMEOUT_SEC", "60"))
-    return TeiEmbedClient(base_url=base_url, timeout_sec=timeout_sec)
+    global _cached_client
+    if _cached_client is None:
+        base_url = os.getenv("TEI_BASE_URL", "http://172.22.51.221:8080")
+        timeout_sec = int(os.getenv("TEI_TIMEOUT_SEC", "60"))
+        _cached_client = TeiEmbedClient(base_url=base_url, timeout_sec=timeout_sec)
+    return _cached_client

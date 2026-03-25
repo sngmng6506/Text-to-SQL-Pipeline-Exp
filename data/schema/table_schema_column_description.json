@@ -1,0 +1,384 @@
+[
+    {
+      "table": "alarm",
+      "description": "시스템에서 발생하는 알람의 코드, 유형, 중요도 및 처리 방법을 정의하는 마스터 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "code", "type": "character varying", "description": "알람 코드" },
+        { "name": "type", "type": "character varying", "description": "알람 유형" },
+        { "name": "description", "type": "character varying", "description": "알람 상세 설명" },
+        { "name": "importance", "type": "integer", "description": "알람 중요도" },
+        { "name": "create_date", "type": "timestamp", "description": "레코드 생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "레코드 수정 일시" },
+        { "name": "process_method", "type": "character varying", "description": "알람 처리 방법" },
+        { "name": "file_id_list", "type": "ARRAY", "description": "관련 파일 ID 목록" },
+        { "name": "valid_record", "type": "boolean", "description": "레코드 유효 여부" },
+        { "name": "send_enabled", "type": "boolean", "description": "알람 전송 활성화 여부" },
+        { "name": "reset_available", "type": "boolean", "description": "알람 리셋 가능 여부" },
+        { "name": "equipment_type_id", "type": "integer", "description": "관련 장비 타입 ID" }
+      ]
+    },
+    {
+      "table": "alarm_history",
+      "description": "과거에 발생한 알람의 발생 시각, 메시지 및 처리 이력을 기록하는 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "알람 발생 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "정보 수정 일시" },
+        { "name": "process_date", "type": "timestamp", "description": "알람 처리 완료 일시 (NULL이면 미처리 상태)" },
+        { "name": "message", "type": "character varying", "description": "알람 메시지 내용" },
+        { "name": "process_message", "type": "character varying", "description": "알람 조치 내용 메시지" },
+        { "name": "type", "type": "character varying", "description": "알람 유형" }
+      ]
+    },
+    {
+      "table": "alarm_queue",
+      "description": "현재 발생 중이거나 조치가 필요한 실시간 알람 대기열 정보를 담고 있습니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "알람 발생 일시" },
+        { "name": "process_status", "type": "integer", "description": "알람 처리 상태" },
+        { "name": "alarm_id", "type": "integer", "description": "알람 마스터 ID" },
+        { "name": "equipment_id", "type": "integer", "description": "발생 장비 ID" }
+      ]
+    },
+    {
+      "table": "alarm_user_relation",
+      "description": "특정 알람과 이를 통지받거나 처리해야 할 사용자 간의 매핑 정보를 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "user_seq_id", "type": "integer", "description": "사용자 일련번호" },
+        { "name": "alarm_id", "type": "integer", "description": "알람 ID" }
+      ]
+    },
+    {
+      "table": "cell_view",
+      "description": "창고 내 각 셀의 위치(x, y, z), 상태, 적재된 SKU 정보 및 수량을 통합하여 보여주는 뷰입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "loc_x", "type": "integer", "description": "X축 좌표" },
+        { "name": "loc_y", "type": "integer", "description": "Y축 좌표" },
+        { "name": "loc_z", "type": "integer", "description": "Z축 좌표" },
+        { "name": "enable", "type": "boolean", "description": "셀 사용 가능 여부" },
+        { "name": "cell_status", "type": "character varying", "description": "셀 상태" },
+        { "name": "sku_key", "type": "character varying", "description": "품목 식별 키" },
+        { "name": "standard_type", "type": "character varying", "description": "규격 타입" },
+        { "name": "st_count", "type": "integer", "description": "수량" },
+        { "name": "in_date", "type": "timestamp", "description": "입고 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "luggage_flag", "type": "boolean", "description": "수하물 존재 여부" },
+        { "name": "batch_number", "type": "character varying", "description": "배치 번호" },
+        { "name": "order_number", "type": "character varying", "description": "주문 번호" },
+        { "name": "order_flow", "type": "character varying", "description": "주문 흐름" },
+        { "name": "loc_all", "type": "character varying", "description": "전체 위치 주소" },
+        { "name": "loc_unit", "type": "character varying", "description": "단위 위치 주소" },
+        { "name": "warehouse_id", "type": "integer", "description": "창고 ID" },
+        { "name": "pallet_id", "type": "integer", "description": "팔레트 ID" }
+      ]
+    },
+    {
+      "table": "crane_cell",
+      "description": "크레인 장비가 담당하는 구역의 물리적 위치(Bank, Bay, Level) 정보를 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "bank", "type": "integer", "description": "뱅크 번호" },
+        { "name": "bay", "type": "integer", "description": "베이 번호" },
+        { "name": "level", "type": "integer", "description": "레벨(층)" },
+        { "name": "enable", "type": "boolean", "description": "사용 가능 여부" },
+        { "name": "cell_status", "type": "USER-DEFINED", "description": "셀 상태" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "equipment_id", "type": "integer", "description": "장비 ID" }
+      ]
+    },
+    {
+      "table": "dock_view",
+      "description": "상하차 도크의 현재 상태, 출고 순번 및 작업 완료/불량 카운트를 관리하는 뷰입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "dock_no", "type": "integer", "description": "도크 번호" },
+        { "name": "gantry_code", "type": "integer", "description": "갠트리 코드" },
+        { "name": "status", "type": "character varying", "description": "도크 상태" },
+        { "name": "shipment_order", "type": "integer", "description": "출하 순번" },
+        { "name": "container_no", "type": "character varying", "description": "컨테이너 번호" },
+        { "name": "unit_order_count", "type": "integer", "description": "단위 주문 수" },
+        { "name": "order_count", "type": "integer", "description": "전체 주문 수" },
+        { "name": "outing_count", "type": "integer", "description": "출고 수량" },
+        { "name": "in_gantry_count", "type": "integer", "description": "갠트리 입고 수" },
+        { "name": "conveyor_count", "type": "integer", "description": "컨베이어 수" },
+        { "name": "completion_count", "type": "integer", "description": "완료 수" },
+        { "name": "remand_count", "type": "integer", "description": "반송 수" },
+        { "name": "bad_count", "type": "integer", "description": "불량 수" }
+      ]
+    },
+    {
+      "table": "equipment",
+      "description": "창고 내 설치된 개별 장비의 명칭, 코드, 사양 정보를 관리하는 마스터 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "spec", "type": "character varying", "description": "장비 사양" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "valid_record", "type": "boolean", "description": "유효 레코드 여부" },
+        { "name": "name", "type": "character varying", "description": "장비 명칭" },
+        { "name": "code", "type": "character varying", "description": "장비 코드" },
+        { "name": "equipment_type_id", "type": "integer", "description": "장비 타입 ID" },
+        { "name": "warehouse_id", "type": "integer", "description": "창고 ID" }
+      ]
+    },
+    {
+      "table": "equipment_alarm_history",
+      "description": "장비별로 발생했던 알람 이력을 연결하여 보여주는 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "equipment_name", "type": "character varying", "description": "장비 명칭" },
+        { "name": "equipment_code", "type": "character varying", "description": "장비 코드" },
+        { "name": "alarm_id", "type": "integer", "description": "알람 ID" },
+        { "name": "alarm_history_id", "type": "integer", "description": "알람 이력 ID" }
+      ]
+    },
+    {
+      "table": "equipment_operation_history",
+      "description": "장비의 가동 상태 및 운영 로그를 기록하는 이력 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "발생 시각" },
+        { "name": "operation_status", "type": "character varying", "description": "가동 상태" },
+        { "name": "operation_maintenance_type", "type": "character varying", "description": "운영/유지보수 유형" },
+        { "name": "description", "type": "character varying", "description": "상세 설명" },
+        { "name": "equipment_id", "type": "integer", "description": "장비 ID" }
+      ]
+    },
+    {
+      "table": "equipment_operation_maintenance",
+      "description": "장비의 유지보수 계획 및 실제 점검 기간과 내용을 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "start_date", "type": "timestamp", "description": "점검 시작 시각" },
+        { "name": "end_date", "type": "timestamp", "description": "점검 종료 시각" },
+        { "name": "create_date", "type": "timestamp", "description": "작성 시각" },
+        { "name": "operation_maintenance_type", "type": "character varying", "description": "유지보수 유형" },
+        { "name": "description", "type": "character varying", "description": "점검 내용" },
+        { "name": "equipment_id", "type": "integer", "description": "장비 ID" }
+      ]
+    },
+    {
+      "table": "equipment_type",
+      "description": "장비의 모델명이나 타입(Crane, Gantry 등)을 정의하는 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "name", "type": "character varying", "description": "모델/타입 명칭" },
+        { "name": "description", "type": "character varying", "description": "타입 설명" },
+        { "name": "valid_record", "type": "boolean", "description": "유효 여부" },
+        { "name": "type", "type": "character varying", "description": "분류" }
+      ]
+    },
+    {
+      "table": "gantry_cell",
+      "description": "갠트리 장비가 담당하는 작업 구역의 물리적 위치 정보를 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "port", "type": "integer", "description": "포트 번호" },
+        { "name": "bank", "type": "integer", "description": "뱅크 번호" },
+        { "name": "bay", "type": "integer", "description": "베이 번호" },
+        { "name": "enable", "type": "boolean", "description": "사용 가능 여부" },
+        { "name": "cell_status", "type": "USER-DEFINED", "description": "셀 상태" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "equipment_id", "type": "integer", "description": "장비 ID" }
+      ]
+    },
+    {
+      "table": "item_master_view",
+      "description": "관리되는 품목(SKU)의 고유 키와 규격 정보를 제공하는 마스터 뷰입니다.",
+      "columns": [
+        { "name": "sku_key", "type": "character varying", "description": "품목 식별 키 (PK)" },
+        { "name": "standard_type", "type": "character varying", "description": "규격 타입" }
+      ]
+    },
+    {
+      "table": "job_history",
+      "description": "입고, 출고, 이동 등 완료된 모든 작업의 상세 이력을 기록합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "sku_key", "type": "character varying", "description": "품목 키" },
+        { "name": "standard_type", "type": "character varying", "description": "규격" },
+        { "name": "working_status", "type": "character varying", "description": "작업 상태" },
+        { "name": "st_count", "type": "integer", "description": "수량" },
+        { "name": "loc_raw", "type": "character varying", "description": "원시 위치 정보" },
+        { "name": "task_type", "type": "character varying", "description": "작업 유형" },
+        { "name": "batch_number", "type": "character varying", "description": "배치 번호" },
+        { "name": "order_number", "type": "character varying", "description": "주문 번호" },
+        { "name": "order_flow", "type": "character varying", "description": "주문 흐름" },
+        { "name": "job_date", "type": "timestamp", "description": "작업 완료 일시" },
+        { "name": "create_date", "type": "timestamp", "description": "레코드 생성 일시" },
+        { "name": "pallet_id", "type": "integer", "description": "팔레트 ID" },
+        { "name": "warehouse_id", "type": "integer", "description": "창고 ID" }
+      ]
+    },
+    {
+      "table": "job_queue",
+      "description": "현재 수행을 위해 대기 중이거나 진행 중인 작업 목록입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "working_status", "type": "character varying", "description": "진행 상태" },
+        { "name": "st_count", "type": "integer", "description": "수량" },
+        { "name": "loc_raw", "type": "character varying", "description": "원시 위치 정보" },
+        { "name": "task_type", "type": "character varying", "description": "작업 유형" },
+        { "name": "batch_number", "type": "character varying", "description": "배치 번호" },
+        { "name": "order_number", "type": "character varying", "description": "주문 번호" },
+        { "name": "order_flow", "type": "character varying", "description": "주문 흐름" },
+        { "name": "job_date", "type": "timestamp", "description": "작업 예정 일시" },
+        { "name": "warehouse_id", "type": "integer", "description": "창고 ID" },
+        { "name": "pallet_id", "type": "integer", "description": "팔레트 ID" },
+        { "name": "sku_key", "type": "character varying", "description": "품목 키" }
+      ]
+    },
+    {
+      "table": "login_history",
+      "description": "사용자의 시스템 접속 시도 IP와 일시를 기록하는 로그인 이력 테이블입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "try_ip", "type": "character varying", "description": "접속 시도 IP" },
+        { "name": "create_date", "type": "timestamp", "description": "접속 일시" },
+        { "name": "users_seq_id", "type": "integer", "description": "사용자 일련번호" }
+      ]
+    },
+    {
+      "table": "noti",
+      "description": "사용자에게 전달되는 공지사항 및 시스템 알림 내용을 저장합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "title", "type": "character varying", "description": "제목" },
+        { "name": "content", "type": "text", "description": "공지 내용" },
+        { "name": "create_date", "type": "timestamp", "description": "작성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "valid_record", "type": "boolean", "description": "유효 여부" },
+        { "name": "users_seq_id", "type": "integer", "description": "작성자/대상자 ID" }
+      ]
+    },
+    {
+      "table": "pallet",
+      "description": "물건을 적재하는 팔레트의 고유 식별 코드를 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "code", "type": "character varying", "description": "팔레트 코드" }
+      ]
+    },
+    {
+      "table": "realtime_equipment_view",
+      "description": "장비의 실시간 위치, 현재 속도, 적재 여부 및 진행 중인 작업 상태를 제공하는 뷰입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "speed", "type": "integer", "description": "현재 속도" },
+        { "name": "status", "type": "character varying", "description": "동작 상태" },
+        { "name": "loc_x", "type": "integer", "description": "X좌표" },
+        { "name": "loc_y", "type": "integer", "description": "Y좌표" },
+        { "name": "loc_z", "type": "integer", "description": "Z좌표" },
+        { "name": "task_type", "type": "character varying", "description": "작업 유형" },
+        { "name": "standard_type", "type": "character varying", "description": "규격" },
+        { "name": "st_count", "type": "integer", "description": "수량" },
+        { "name": "create_date", "type": "timestamp", "description": "수집 시각" },
+        { "name": "twin_status", "type": "character varying", "description": "디지털 트윈 상태" },
+        { "name": "loaded", "type": "boolean", "description": "적재 여부" },
+        { "name": "action_type", "type": "character varying", "description": "액션 유형" },
+        { "name": "equipment_id", "type": "integer", "description": "장비 ID" }
+      ]
+    },
+    {
+      "table": "realtime_warehouse_view",
+      "description": "창고 내 위치별 장비 배치 현황과 실시간 적재 상태를 보여주는 뷰입니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "equipment_code", "type": "character varying", "description": "장비 코드" },
+        { "name": "loc_x", "type": "integer", "description": "X좌표" },
+        { "name": "loc_y", "type": "integer", "description": "Y좌표" },
+        { "name": "loc_z", "type": "integer", "description": "Z좌표" },
+        { "name": "loaded", "type": "boolean", "description": "적재 여부" },
+        { "name": "use_type", "type": "USER-DEFINED", "description": "사용 유형" },
+        { "name": "standard_type", "type": "character varying", "description": "규격" },
+        { "name": "st_count", "type": "integer", "description": "수량" },
+        { "name": "warehouse_id", "type": "integer", "description": "창고 ID" }
+      ]
+    },
+    {
+      "table": "role",
+      "description": "사용자별 시스템 접근 권한 및 역할을 정의합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "type", "type": "character varying", "description": "권한 유형" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "valid_record", "type": "boolean", "description": "유효 여부" },
+        { "name": "description", "type": "character varying", "description": "역할 설명" },
+        { "name": "user_seq_id", "type": "integer", "description": "사용자 ID" }
+      ]
+    },
+    {
+      "table": "setting_system",
+      "description": "알람 활성화 여부 및 장비 부하 경고 임계치 등 시스템 전반의 설정값을 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "alarm_send_enabled", "type": "boolean", "description": "알람 전송 활성화" },
+        { "name": "equipment_alarm_enabled", "type": "boolean", "description": "장비 알람 활성화" },
+        { "name": "inventory_alarm_enabled", "type": "boolean", "description": "재고 알람 활성화" },
+        { "name": "inventory_alarm_remaining_day", "type": "integer", "description": "재고 알람 기준일" },
+        { "name": "load_warning_ratio_crane", "type": "integer", "description": "크레인 부하 경고 비율" },
+        { "name": "load_danger_ratio_crane", "type": "integer", "description": "크레인 부하 위험 비율" },
+        { "name": "load_warning_color_crane", "type": "character varying", "description": "크레인 경고 색상" },
+        { "name": "load_danger_color_crane", "type": "character varying", "description": "크레인 위험 색상" },
+        { "name": "load_warning_ratio_gantry", "type": "integer", "description": "갠트리 부하 경고 비율" },
+        { "name": "load_danger_ratio_gantry", "type": "integer", "description": "갠트리 부하 위험 비율" },
+        { "name": "load_warning_color_gantry", "type": "character varying", "description": "갠트리 경고 색상" },
+        { "name": "load_danger_color_gantry", "type": "character varying", "description": "갠트리 위험 색상" },
+        { "name": "refresh_browser", "type": "boolean", "description": "브라우저 자동 갱신" }
+      ]
+    },
+    {
+      "table": "stored_item",
+      "description": "창고에 실제로 보관된 개별 아이템의 상세 규격 및 정보를 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "standard_type", "type": "character varying", "description": "규격 타입" },
+        { "name": "detail", "type": "character varying", "description": "상세 정보" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "sku_id", "type": "character varying", "description": "SKU ID" }
+      ]
+    },
+    {
+      "table": "users",
+      "description": "시스템 사용자 계정 정보, 연락처 및 소속 정보를 담고 있는 마스터 테이블입니다.",
+      "columns": [
+        { "name": "seq_id", "type": "integer", "description": "사용자 고유 일련번호 (PK)" },
+        { "name": "user_id", "type": "character varying", "description": "로그인 ID" },
+        { "name": "password", "type": "character varying", "description": "비밀번호" },
+        { "name": "email", "type": "character varying", "description": "이메일" },
+        { "name": "name", "type": "character varying", "description": "성명" },
+        { "name": "affiliation", "type": "character varying", "description": "소속" },
+        { "name": "phone_number", "type": "character varying", "description": "전화번호" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "valid_record", "type": "boolean", "description": "유효 계정 여부" },
+        { "name": "blocking", "type": "boolean", "description": "계정 차단 여부" }
+      ]
+    },
+    {
+      "table": "warehouse",
+      "description": "관리 대상인 창고 시설의 명칭과 유형 코드를 관리합니다.",
+      "columns": [
+        { "name": "id", "type": "integer", "description": "고유 식별자 (PK)" },
+        { "name": "create_date", "type": "timestamp", "description": "생성 일시" },
+        { "name": "update_date", "type": "timestamp", "description": "수정 일시" },
+        { "name": "valid_record", "type": "boolean", "description": "유효 여부" },
+        { "name": "type", "type": "character varying", "description": "창고 유형" },
+        { "name": "code", "type": "character varying", "description": "창고 코드" },
+        { "name": "name", "type": "character varying", "description": "창고 명칭" }
+      ]
+    }
+  ]

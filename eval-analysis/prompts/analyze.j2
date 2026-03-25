@@ -1,0 +1,102 @@
+당신은 SQL 평가 전문가입니다.
+아래 정보를 바탕으로 생성된 SQL이 정답인지 판단하고, 오류가 있다면 유형을 분류하세요.
+
+---
+
+## 자연어 질문
+{{ question }}
+
+## 정답 SQL
+{{ gt_sql }}
+
+## 생성된 SQL
+{{ gen_sql }}
+
+## Schema Linking JSON
+{{ schema_linking_json }}
+
+## IR JSON (질의 재작성 결과)
+{{ ir_json }}
+
+※ IR JSON 및 SQL 해석 안내:
+- `COMPUTED` 필드가 있으면 CASE WHEN 기반 계산 컬럼으로, 생성된 SQL의 SELECT 절에 포함되어야 한다.
+- `FILTER`에 `IS NULL` / `IS NOT NULL` 조건이 있으면 "미처리/처리완료" 등 상태를 날짜 컬럼의 NULL 여부로 판단한 것으로, 정상적인 표현이다.
+- 비율 비교를 `A > B * k` 곱셈 형태로 표현한 경우, 정답 SQL의 `A / B > k` 나눗셈 형태와 수학적으로 동치이므로 실행 결과가 같으면 CORRECT로 간주한다. WRONG_FILTER_OPERATOR로 분류하지 않는다.
+- boolean 컬럼 비교를 `IS TRUE` / `IS FALSE` 형태로 표현한 경우, 정답 SQL의 `= 1` / `= 0` 형태와 의미상 동치이므로 실행 결과가 같으면 CORRECT로 간주한다. TYPE_MISMATCH로 분류하지 않는다.
+
+## 정답 실행 결과
+{{ gt_result }}
+
+## 생성된 SQL 실행 결과
+{{ gen_result }}
+
+## 실행 오류
+{{ exec_error }}
+
+---
+
+## 판단 기준
+- 정답 SQL과 생성 SQL의 실행 결과가 의미적으로 동일하면 CORRECT
+- 결과가 다르거나 오류가 있으면 WRONG
+- 단, 아래 경우는 CORRECT로 간주한다:
+  - 생성 SQL에만 LIMIT이 붙어 행 수가 적지만, 반환된 행이 정답 결과의 앞부분과 일치하는 경우
+  - 컬럼 순서만 다르고 값이 동일한 경우
+  - 정답과 생성 결과의 값이 동일하나 소수점 표현 등 미미한 포맷 차이만 있는 경우
+
+## 오류 타입 (WRONG일 경우 하나만 선택)
+
+### 0) 생성/실행 자체 실패
+- NO_SQL           : SQL이 비어있거나 "[ERROR]" 상태로 사실상 생성 실패
+- SQL_SYNTAX       : SQL 문법 오류 (파싱 불가)
+- EXECUTION_ERROR  : SQL은 생성되었으나 DB 실행 오류 발생 (권한/타임아웃/함수 미지원 포함)
+
+### 1) 스키마 선택/매핑 오류
+- WRONG_TABLE      : 잘못된 테이블 선택, 필요한 테이블 누락
+- WRONG_COLUMN     : 잘못된 컬럼 선택, 필요한 컬럼 누락, 컬럼 치환 오류
+- WRONG_JOIN       : JOIN 누락/과다, JOIN ON 조건 오류, 조인 키 불일치
+
+### 2) 조건/필터 오류
+- MISSING_FILTER        : 질문에서 요구한 필터가 빠짐
+- WRONG_FILTER_COLUMN   : 필터 컬럼 자체를 잘못 선택
+- WRONG_FILTER_VALUE    : 필터 값이 질문/정답과 다름
+- WRONG_FILTER_OPERATOR : 연산자(=, >, <, BETWEEN, IN, LIKE/ILIKE 등) 선택 오류
+- TYPE_MISMATCH         : 컬럼 타입과 값/연산이 불일치
+
+### 3) 집계/그룹/후처리 오류
+- WRONG_AGGREGATE_FUNC  : COUNT/SUM/AVG/MIN/MAX 등 집계 함수 선택 오류
+- MISSING_GROUP_BY      : GROUP BY가 필요하지만 누락됨
+- WRONG_GROUP_BY        : GROUP BY 컬럼 선택 오류
+- WRONG_HAVING          : HAVING 조건식 오류
+
+### 4) 정렬/행수/투영 오류
+- WRONG_ORDER_BY     : ORDER BY 컬럼 또는 ASC/DESC 방향 오류
+- WRONG_LIMIT        : LIMIT/OFFSET 설정 오류 (필요 없는데 제한, 또는 제한 누락/값 오류)
+- WRONG_PROJECTION   : SELECT 대상(출력 컬럼/표현식) 오류
+- DUPLICATE_HANDLING : DISTINCT 필요 여부 판단 오류로 중복 처리 실패
+
+### 5) 기타
+- OTHER              : 위 분류로 설명하기 어려운 경우
+
+## 분류 우선순위 (겹칠 때)
+1. NO_SQL / SQL_SYNTAX / EXECUTION_ERROR
+2. WRONG_TABLE / WRONG_COLUMN / WRONG_JOIN
+3. MISSING_FILTER / WRONG_FILTER_COLUMN / WRONG_FILTER_VALUE / WRONG_FILTER_OPERATOR / TYPE_MISMATCH
+4. WRONG_AGGREGATE_FUNC / MISSING_GROUP_BY / WRONG_GROUP_BY / WRONG_HAVING
+5. WRONG_ORDER_BY / WRONG_LIMIT / WRONG_PROJECTION / DUPLICATE_HANDLING
+6. OTHER
+
+---
+
+반드시 아래 JSON 형식으로만 출력하세요. 다른 텍스트 금지.
+```json
+{
+  "correctness": "CORRECT" | "WRONG",
+  "error_type": "없음" | "<위 오류 타입 중 하나>",
+  "failure_stage": "none" | "schema_linking" | "ir_generation" | "sql_generation" | "execution",
+  "schema_linking_judgement": "OK" | "ISSUE" | "UNKNOWN",
+  "schema_linking_comment": "<schema linking 품질 코멘트 1줄>",
+  "ir_judgement": "OK" | "ISSUE" | "UNKNOWN",
+  "ir_comment": "<IR 품질 코멘트 1줄>",
+  "comment": "<한 줄 설명>"
+}
+```

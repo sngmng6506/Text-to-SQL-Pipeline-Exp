@@ -1,7 +1,8 @@
-# 환경 변수 (DB 비밀번호 등 민감 정보)
+# 환경 변수 (DB 비밀번호, API 키 등 민감 정보)
 .env
 .env.local
 .env.*.local
+eval-analysis/.env
 
 # Python
 __pycache__/
@@ -27,3 +28,20 @@ Thumbs.db
 
 # 산출물
 artifacts/
+
+# 평가 데이터셋 (사내 데이터)
+data/eval_data/*.xlsx
+
+# 평가/분석 결과
+data/eval_data/results/
+data/eval_data/results-simple/
+eval-analysis/results/
+
+# MQS 생성 산출물
+MQS-pool/spider/**/pool_embeddings.npz
+MQS-pool/spider/**/pool_embeddings_en.npz
+MQS-pool/spider/**/pool.json
+
+# 로그/임시 파일
+*.log
+*.tmp

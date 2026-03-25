@@ -1,7 +1,7 @@
 """
 PostgreSQL 실행 유틸
 
-주의: 파괴적 SQL을 막기 위해 SELECT/WITH만 허용합니다.
+주의: SELECT/WITH만 허용
 """
 
 from __future__ import annotations
@@ -12,7 +12,6 @@ from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
-
 
 
 _SAFE_SQL_RE = re.compile(r"^\s*(select|with)\b", flags=re.IGNORECASE)
@@ -36,3 +35,5 @@ def execute_sql(sql: str) -> list[dict[str, Any]]:
             cur.execute(sql)
             rows = cur.fetchall()
             return [dict(r) for r in rows]
+
+

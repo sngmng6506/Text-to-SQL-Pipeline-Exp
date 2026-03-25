@@ -1,0 +1,132 @@
+[
+  {
+    "table": "alarm",
+    "schema_text": "Table: alarm | Columns: id (integer) [PK], code (character varying), type (character varying), description (character varying), importance (integer), create_date (timestamp without time zone), update_date (timestamp without time zone), process_method (character varying), file_id_list (ARRAY), valid_record (boolean), send_enabled (boolean), reset_available (boolean), equipment_type_id (integer)",
+    "description": "시스템에서 발생하는 알람의 코드, 유형, 중요도 및 처리 방법을 정의하는 마스터 테이블입니다."
+  },
+  {
+    "table": "alarm_history",
+    "schema_text": "Table: alarm_history | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), process_date (timestamp without time zone), message (character varying), process_message (character varying), type (character varying)",
+    "description": "과거에 발생한 알람의 발생 시각, 메시지 및 처리 이력을 기록하는 테이블입니다."
+  },
+  {
+    "table": "alarm_queue",
+    "schema_text": "Table: alarm_queue | Columns: id (integer) [PK], create_date (timestamp without time zone), process_status (integer), alarm_id (integer), equipment_id (integer)",
+    "description": "현재 발생 중이거나 조치가 필요한 실시간 알람 대기열 정보를 담고 있습니다."
+  },
+  {
+    "table": "alarm_user_relation",
+    "schema_text": "Table: alarm_user_relation | Columns: id (integer) [PK], user_seq_id (integer), alarm_id (integer)",
+    "description": "특정 알람과 이를 통지받거나 처리해야 할 사용자 간의 매핑 정보를 관리합니다."
+  },
+  {
+    "table": "cell_view",
+    "schema_text": "Table: cell_view | Columns: id (integer) [PK], loc_x (integer), loc_y (integer), loc_z (integer), enable (boolean), cell_status (character varying), sku_key (character varying), standard_type (character varying), st_count (integer), in_date (timestamp without time zone), update_date (timestamp without time zone), luggage_flag (boolean), batch_number (character varying), order_number (character varying), order_flow (character varying), loc_all (character varying), loc_unit (character varying), warehouse_id (integer), pallet_id (integer)",
+    "description": "창고 내 각 셀의 위치(x, y, z), 상태, 적재된 SKU 정보 및 수량을 통합하여 보여주는 뷰입니다."
+  },
+  {
+    "table": "crane_cell",
+    "schema_text": "Table: crane_cell | Columns: id (integer) [PK], bank (integer), bay (integer), level (integer), enable (boolean), cell_status (USER-DEFINED), create_date (timestamp without time zone), update_date (timestamp without time zone), equipment_id (integer)",
+    "description": "크레인 장비가 담당하는 구역의 물리적 위치(Bank, Bay, Level) 정보를 관리합니다."
+  },
+  {
+    "table": "dock_view",
+    "schema_text": "Table: dock_view | Columns: id (integer) [PK], dock_no (integer), gantry_code (integer), status (character varying), shipment_order (integer), container_no (character varying), unit_order_count (integer), order_count (integer), outing_count (integer), in_gantry_count (integer), conveyor_count (integer), completion_count (integer), remand_count (integer), bad_count (integer)",
+    "description": "상하차 도크의 현재 상태, 출고 순번 및 작업 완료/불량 카운트를 관리하는 뷰입니다."
+  },
+  {
+    "table": "equipment",
+    "schema_text": "Table: equipment | Columns: id (integer) [PK], spec (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), name (character varying), code (character varying), equipment_type_id (integer), warehouse_id (integer)",
+    "description": "창고 내 설치된 개별 장비의 명칭, 코드, 사양 정보를 관리하는 마스터 테이블입니다."
+  },
+  {
+    "table": "equipment_alarm_history",
+    "schema_text": "Table: equipment_alarm_history | Columns: id (integer) [PK], equipment_name (character varying), equipment_code (character varying), alarm_id (integer), alarm_history_id (integer)",
+    "description": "장비별로 발생했던 알람 이력을 연결하여 보여주는 테이블입니다."
+  },
+  {
+    "table": "equipment_operation_history",
+    "schema_text": "Table: equipment_operation_history | Columns: id (integer) [PK], create_date (timestamp without time zone), operation_status (character varying), operation_maintenance_type (character varying), description (character varying), equipment_id (integer)",
+    "description": "장비의 가동 상태 및 운영 로그를 기록하는 이력 테이블입니다."
+  },
+  {
+    "table": "equipment_operation_maintenance",
+    "schema_text": "Table: equipment_operation_maintenance | Columns: id (integer) [PK], start_date (timestamp without time zone), end_date (timestamp without time zone), create_date (timestamp without time zone), operation_maintenance_type (character varying), description (character varying), equipment_id (integer)",
+    "description": "장비의 유지보수 계획 및 실제 점검 기간과 내용을 관리합니다."
+  },
+  {
+    "table": "equipment_type",
+    "schema_text": "Table: equipment_type | Columns: id (integer) [PK], create_date (timestamp without time zone), name (character varying), description (character varying), valid_record (boolean), type (character varying)",
+    "description": "장비의 모델명이나 타입(Crane, Gantry 등)을 정의하는 테이블입니다."
+  },
+  {
+    "table": "gantry_cell",
+    "schema_text": "Table: gantry_cell | Columns: id (integer) [PK], port (integer), bank (integer), bay (integer), enable (boolean), cell_status (USER-DEFINED), create_date (timestamp without time zone), update_date (timestamp without time zone), equipment_id (integer)",
+    "description": "갠트리 장비가 담당하는 작업 구역의 물리적 위치 정보를 관리합니다."
+  },
+  {
+    "table": "item_master_view",
+    "schema_text": "Table: item_master_view | Columns: sku_key (character varying) [PK], standard_type (character varying)",
+    "description": "관리되는 품목(SKU)의 고유 키와 규격 정보를 제공하는 마스터 뷰입니다."
+  },
+  {
+    "table": "job_history",
+    "schema_text": "Table: job_history | Columns: id (integer) [PK], sku_key (character varying), standard_type (character varying), working_status (character varying), st_count (integer), loc_raw (character varying), task_type (character varying), batch_number (character varying), order_number (character varying), order_flow (character varying), job_date (timestamp without time zone), create_date (timestamp without time zone), pallet_id (integer), warehouse_id (integer)",
+    "description": "입고, 출고, 이동 등 완료된 모든 작업의 상세 이력을 기록합니다."
+  },
+  {
+    "table": "job_queue", 
+    "schema_text": "Table: job_queue | Columns: id (integer) [PK], working_status (character varying), st_count (integer), loc_raw (character varying), task_type (character varying), batch_number (character varying), order_number (character varying), order_flow (character varying), job_date (timestamp without time zone), warehouse_id (integer), pallet_id (integer), sku_key (character varying)",
+    "description": "현재 수행을 위해 대기 중이거나 진행 중인 작업 목록입니다."
+  },
+  {
+    "table": "login_history",
+    "schema_text": "Table: login_history | Columns: id (integer) [PK], try_ip (character varying), create_date (timestamp without time zone), users_seq_id (integer)",
+    "description": "사용자의 시스템 접속 시도 IP와 일시를 기록하는 로그인 이력 테이블입니다."
+  },
+  {
+    "table": "noti",
+    "schema_text": "Table: noti | Columns: id (integer) [PK], title (character varying), content (text), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), users_seq_id (integer)",
+    "description": "사용자에게 전달되는 공지사항 및 시스템 알림 내용을 저장합니다."
+  },
+  {
+    "table": "pallet",
+    "schema_text": "Table: pallet | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), code (character varying)",
+    "description": "물건을 적재하는 팔레트의 고유 식별 코드를 관리합니다."
+  },
+  {
+    "table": "realtime_equipment_view",
+    "schema_text": "Table: realtime_equipment_view | Columns: id (integer) [PK], speed (integer), status (character varying), loc_x (integer), loc_y (integer), loc_z (integer), task_type (character varying), standard_type (character varying), st_count (integer), create_date (timestamp without time zone), twin_status (character varying), loaded (boolean), action_type (character varying), equipment_id (integer)",
+    "description": "장비의 실시간 위치, 현재 속도, 적재 여부 및 진행 중인 작업 상태를 제공하는 뷰입니다."
+  },
+  {
+    "table": "realtime_warehouse_view",
+    "schema_text": "Table: realtime_warehouse_view | Columns: id (integer) [PK], equipment_code (character varying), loc_x (integer), loc_y (integer), loc_z (integer), loaded (boolean), use_type (USER-DEFINED), standard_type (character varying), st_count (integer), warehouse_id (integer)",
+    "description": "창고 내 위치별 장비 배치 현황과 실시간 적재 상태를 보여주는 뷰입니다."
+  },
+  {
+    "table": "role",
+    "schema_text": "Table: role | Columns: id (integer) [PK], type (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), description (character varying), user_seq_id (integer)",
+    "description": "사용자별 시스템 접근 권한 및 역할을 정의합니다."
+  },
+  {
+    "table": "setting_system",
+    "schema_text": "Table: setting_system | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), alarm_send_enabled (boolean), equipment_alarm_enabled (boolean), inventory_alarm_enabled (boolean), inventory_alarm_remaining_day (integer), load_warning_ratio_crane (integer), load_danger_ratio_crane (integer), load_warning_color_crane (character varying), load_danger_color_crane (character varying), load_warning_ratio_gantry (integer), load_danger_ratio_gantry (integer), load_warning_color_gantry (character varying), load_danger_color_gantry (character varying), refresh_browser (boolean)",
+    "description": "알람 활성화 여부 및 장비 부하 경고 임계치 등 시스템 전반의 설정값을 관리합니다."
+  },
+  {
+    "table": "stored_item",
+    "schema_text": "Table: stored_item | Columns: id (integer) [PK], standard_type (character varying), detail (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), sku_id (character varying)",
+    "description": "창고에 실제로 보관된 개별 아이템의 상세 규격 및 정보를 관리합니다."
+  },
+  {
+    "table": "users",
+    "schema_text": "Table: users | Columns: seq_id (integer) [PK], user_id (character varying), password (character varying), email (character varying), name (character varying), affiliation (character varying), phone_number (character varying), create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), blocking (boolean)",
+    "description": "시스템 사용자 계정 정보, 연락처 및 소속 정보를 담고 있는 마스터 테이블입니다."
+  },
+  {
+    "table": "warehouse",
+    "schema_text": "Table: warehouse | Columns: id (integer) [PK], create_date (timestamp without time zone), update_date (timestamp without time zone), valid_record (boolean), type (character varying), code (character varying), name (character varying)",
+    "description": "관리 대상인 창고 시설의 명칭과 유형 코드를 관리합니다."
+  }
+]

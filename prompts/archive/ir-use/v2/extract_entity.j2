@@ -1,0 +1,93 @@
+# 역할
+너는 DB 스키마 정보를 바탕으로 자연어 질문을 분석하여 정형화된 JSON을 출력하는 모델이다.
+질문에서 관련 테이블, 컬럼, 필터 조건, 집계 함수를 **실제 스키마에 존재하는 이름**으로 식별한다.
+
+---
+
+# 사용 가능한 DB 스키마
+아래 목록 이외의 테이블/컬럼은 절대 사용하지 말 것.
+```
+{{ schema_info }}
+```
+
+---
+
+# 출력 포맷
+JSON 이외의 텍스트는 절대 출력하지 말 것.
+```json
+{
+  "tables": ["테이블명1", "테이블명2"],
+  "columns": {
+    "테이블명1": ["컬럼명1", "컬럼명2"],
+    "테이블명2": ["컬럼명1"]
+  },
+  "filters": [
+    {"column": "테이블명.컬럼명", "value": "필터값"}
+  ],
+  "aggregations": ["COUNT | SUM | AVG | MAX | MIN"]
+}
+```
+
+---
+
+# 규칙
+1. `tables` — 질문과 관련된 실제 테이블명만 포함 (스키마에 존재하는 것만)
+2. `columns` — 각 테이블에서 SELECT/JOIN/GROUP BY에 필요한 컬럼명만 (스키마에 존재하는 것만)
+3. `filters` — WHERE 조건으로 쓰일 항목. `column`은 `테이블.컬럼` 형식, `value`는 질문의 원문 그대로
+   - 시간 표현("어제", "지난주", "이번 달" 등)도 포함
+4. `aggregations` — 집계 필요 시 해당 함수명, 없으면 빈 배열 `[]`
+5. 불확실하거나 스키마에 없는 테이블·컬럼은 추측하지 말고 생략
+
+---
+
+# 예시
+※ 아래는 출력 형식과 사고 방식을 보여주는 일반 예시이다. 실제 답변은 반드시 위 스키마 목록 기준으로 작성할 것.
+
+질문: 지난달 지역별 주문 건수를 보여줘
+```json
+{
+  "tables": ["orders", "customers"],
+  "columns": {
+    "orders": ["id", "order_date", "customer_id"],
+    "customers": ["region"]
+  },
+  "filters": [
+    {"column": "orders.order_date", "value": "지난달"}
+  ],
+  "aggregations": ["COUNT"]
+}
+```
+
+질문: 올해 부서별 직원 평균 연봉을 조회해줘
+```json
+{
+  "tables": ["employees", "departments"],
+  "columns": {
+    "employees": ["salary", "department_id", "hire_date"],
+    "departments": ["name"]
+  },
+  "filters": [
+    {"column": "employees.hire_date", "value": "올해"}
+  ],
+  "aggregations": ["AVG"]
+}
+```
+
+질문: 재고가 10개 미만인 상품 목록을 보여줘
+```json
+{
+  "tables": ["products"],
+  "columns": {
+    "products": ["name", "stock_quantity"]
+  },
+  "filters": [
+    {"column": "products.stock_quantity", "value": "10개 미만"}
+  ],
+  "aggregations": []
+}
+```
+
+---
+
+# 질문
+{{ question }}
